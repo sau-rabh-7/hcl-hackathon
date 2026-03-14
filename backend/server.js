@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import routes from './src/routes/index.js';
+import authRoutes from './src/routes/authRoutes.js';
 
 dotenv.config();
 
@@ -36,3 +37,5 @@ mongoose.connect(MONGODB_URI)
     console.error('MongoDB connection failed:', error);
     process.exit(1);
   });
+
+app.use("/api/auth", authRoutes);
