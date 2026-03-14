@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
 import ProductCard from '../components/ProductCard';
 import AddOnModal from '../components/AddOnModal';
-import { Search, ChevronRight, Flame } from 'lucide-react';
+import Footer from '../components/Footer';
+import { Search, ChevronRight, Flame, Truck, ShieldCheck, Clock, Star } from 'lucide-react';
 
 const HomePage = () => {
   const [categories, setCategories] = useState([]);
@@ -174,9 +175,78 @@ const HomePage = () => {
         </div>
       </div>
 
+      {/* ── Trust Badges (Why Choose Us) ── */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-white rounded-2xl p-4 shadow-card flex flex-col items-center text-center group hover:scale-105 transition-transform duration-300 border border-gray-50">
+            <div className="w-12 h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
+              <Truck className="w-6 h-6" />
+            </div>
+            <h4 className="font-bold text-brand-dark text-sm">Free Delivery</h4>
+            <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider font-bold">Orders over ₹500</p>
+          </div>
+          <div className="bg-white rounded-2xl p-4 shadow-card flex flex-col items-center text-center group hover:scale-105 transition-transform duration-300 border border-gray-50">
+            <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-3 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <h4 className="font-bold text-brand-dark text-sm">Secure Pay</h4>
+            <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider font-bold">100% Protected</p>
+          </div>
+          <div className="bg-white rounded-2xl p-4 shadow-card flex flex-col items-center text-center group hover:scale-105 transition-transform duration-300 border border-gray-50">
+            <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mb-3 group-hover:bg-green-600 group-hover:text-white transition-colors duration-300">
+              <Clock className="w-6 h-6" />
+            </div>
+            <h4 className="font-bold text-brand-dark text-sm">Fast Service</h4>
+            <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider font-bold">Under 30 Mins</p>
+          </div>
+          <div className="bg-white rounded-2xl p-4 shadow-card flex flex-col items-center text-center group hover:scale-105 transition-transform duration-300 border border-gray-50">
+            <div className="w-12 h-12 bg-yellow-100 text-yellow-600 rounded-xl flex items-center justify-center mb-3 group-hover:bg-yellow-600 group-hover:text-white transition-colors duration-300">
+              <Star className="w-6 h-6" />
+            </div>
+            <h4 className="font-bold text-brand-dark text-sm">Best Quality</h4>
+            <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider font-bold">Top Rated Food</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Promotional Banner ── */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <div className="bg-brand-yellow rounded-[2rem] p-8 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 group-hover:scale-110 transition-transform duration-700" />
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-brand-red/10 rounded-full -ml-10 -mb-10" />
+          
+          <div className="relative z-10 flex-1 text-center md:text-left">
+            <span className="inline-block bg-brand-red text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-[0.2em] mb-4 shadow-sm animate-pulse">
+              Limited Time Offer
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black text-brand-dark mb-3 leading-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              Double Cheese <br className="hidden sm:block"/>
+              <span className="text-brand-red underline decoration-brand-red/30 underline-offset-4">Extravaganza!</span>
+            </h2>
+            <p className="text-brand-dark/70 font-semibold mb-6 max-w-sm mx-auto md:mx-0">
+              Get 50% OFF on your second burger. Valid for all combo meals today only.
+            </p>
+            <button className="bg-brand-dark text-white font-bold px-8 py-3.5 rounded-2xl hover:bg-black transition-all active:scale-95 shadow-lg flex items-center gap-2 mx-auto md:mx-0">
+               Claim Deal Now
+               <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="relative z-10 flex-1 flex justify-center items-center">
+             <div className="relative">
+                <div className="absolute inset-0 bg-brand-yellow rounded-full blur-3xl opacity-50 animate-pulse" />
+                <img 
+                  src="https://www.mcdonalds.com/is/image/content/dam/usa/nfl/assets/promo/HP_Deal_DoubleCheeseburger_1v1_832x822.png?$Publication_One_Column_Desktop$" 
+                  alt="Deal" 
+                  className="w-64 h-64 object-contain drop-shadow-2xl transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500"
+                />
+             </div>
+          </div>
+        </div>
+      </div>
 
       {/* ── Products Section ── */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
         {/* Section Header */}
         <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-gray-200 pb-4">
           <div>
@@ -262,6 +332,8 @@ const HomePage = () => {
         onClose={() => setIsModalOpen(false)}
         product={selectedProduct}
       />
+
+      <Footer />
     </div>
   );
 };

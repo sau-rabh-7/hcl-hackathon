@@ -18,7 +18,7 @@ const AdminDashboardPage = () => {
       try {
         const [productsRes, categoriesRes, ordersRes] = await Promise.all([
           api.get('/products/admin/all'),
-          api.get('/categories'),
+          api.get('/categories/admin/all'),
           api.get('/orders/admin/all'),
         ]);
 
@@ -26,9 +26,13 @@ const AdminDashboardPage = () => {
         const categories = categoriesRes.data;
         const orders = ordersRes.data;
 
-        const totalRevenue = orders
-          .filter(o => o.status === 'Paid')
-          .reduce((sum, order) => sum + order.totalAmount, 0);
+        // Calculate revenue only for items belonging to this seller
+        const totalRevenue = orders.reduce((sum, order) => {
+          const sellerItemsTotal = order.items.reduce((itemSum, item) => {
+            return itemSum + (item.priceAtPurchase * item.quantity);
+          }, 0);
+          return sum + sellerItemsTotal;
+        }, 0);
 
         const lowStockCount = products.filter(p => p.stockQuantity < 5).length;
 

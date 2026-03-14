@@ -95,9 +95,9 @@ const Navbar = ({ toggleCart }) => {
                 )}
                 <Link
                   to="/orders"
-                  className={`text-sm font-semibold px-3 py-1.5 rounded-full transition-all duration-200 hidden sm:block ${
+                  className={`text-sm font-semibold px-4 py-1.5 rounded-full transition-all duration-200 hidden sm:block ${
                     isActive('/orders')
-                      ? 'bg-white/20 text-white'
+                      ? 'bg-white/20 text-white shadow-inner'
                       : 'hover:bg-white/10 text-white/90 hover:text-white'
                   }`}
                 >
