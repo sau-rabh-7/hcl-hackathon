@@ -77,7 +77,7 @@ const LoginPage = () => {
         </div>
 
         <p className="relative z-10 text-white/30 text-xs font-medium">
-          © 2025 McDonald's Hackathon Portal
+          © 2026 McDonald's Hackathon Portal
         </p>
       </div>
 
