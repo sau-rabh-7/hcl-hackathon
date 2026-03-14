@@ -1,5 +1,5 @@
 import express from 'express';
-import { createCategory, getCategories, getCategoryProducts } from '../controllers/categoryController.js';
+import { createCategory, getCategories, updateCategory, deleteCategory, getCategoryProducts } from '../controllers/categoryController.js';
 import { protect } from '../middlewares/auth.js';
 import { adminOnly } from '../middlewares/adminOnly.js';
 
@@ -10,5 +10,9 @@ router.route('/')
   .get(getCategories);
 
 router.get('/:id/products', getCategoryProducts);
+
+router.route('/:id')
+  .put(protect, adminOnly, updateCategory)
+  .delete(protect, adminOnly, deleteCategory);
 
 export default router;

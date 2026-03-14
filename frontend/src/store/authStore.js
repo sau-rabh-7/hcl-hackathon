@@ -7,11 +7,13 @@ export const useAuthStore = create(
       user: null,
       token: null,
       isAuthenticated: false,
+      isAdmin: false,
       login: (userData, token) => {
         set({
           user: userData,
           token: token,
           isAuthenticated: true,
+          isAdmin: userData?.role === 'Admin',
         });
       },
       logout: () => {
@@ -19,6 +21,7 @@ export const useAuthStore = create(
           user: null,
           token: null,
           isAuthenticated: false,
+          isAdmin: false,
         });
         // Also clear cart on logout
         localStorage.removeItem('cart-storage');

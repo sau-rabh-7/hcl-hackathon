@@ -1,20 +1,25 @@
 import Product from '../models/Product.js';
 import StockLedger from '../models/StockLedger.js';
+import Order from '../models/Order.js';
 
-// @desc    Create a product
+// @desc    Create a product (admin)
 // @route   POST /api/products
 export const createProduct = async (req, res) => {
   try {
     const { categoryId, title, description, cost, taxPercentage, imageUrl, stockQuantity, isCombo, addons } = req.body;
 
+    if (!categoryId || !title || !description || cost === undefined || stockQuantity === undefined) {
+      return res.status(400).json({ error: 'BAD_REQUEST', message: 'Please provide all required fields' });
+    }
+
     const product = await Product.create({
       categoryId,
       title,
       description,
-      cost,
+      cost: Number(cost),
       taxPercentage: taxPercentage || 0,
       imageUrl,
-      stockQuantity,
+      stockQuantity: Number(stockQuantity),
       isCombo: isCombo || false,
       addons: addons || [],
     });
@@ -22,7 +27,7 @@ export const createProduct = async (req, res) => {
     if (stockQuantity > 0) {
       await StockLedger.create({
         productId: product._id,
-        changeAmount: stockQuantity,
+        changeAmount: Number(stockQuantity),
         reason: 'Initial Stock Deposit',
         performedBy: req.user._id,
       });
@@ -35,7 +40,42 @@ export const createProduct = async (req, res) => {
   }
 };
 
-// @desc    Get all products (paginated)
+// @desc    Get all products for admin (no pagination limit)
+// @route   GET /api/products/admin/all
+export const getAdminProducts = async (req, res) => {
+  try {
+    const products = await Product.find({})
+      .populate('categoryId', 'name')
+      .populate('addons', 'title cost imageUrl')
+      .sort({ createdAt: -1 });
+
+    // Compute revenue per product from Order history
+    const allOrders = await Order.find({ status: 'Paid' });
+    const revenueMap = {};
+    const unitsSoldMap = {};
+
+    for (const order of allOrders) {
+      for (const item of order.items) {
+        const pid = item.productId.toString();
+        revenueMap[pid] = (revenueMap[pid] || 0) + item.priceAtPurchase * item.quantity;
+        unitsSoldMap[pid] = (unitsSoldMap[pid] || 0) + item.quantity;
+      }
+    }
+
+    const enriched = products.map(p => ({
+      ...p.toObject(),
+      revenue: revenueMap[p._id.toString()] || 0,
+      unitsSold: unitsSoldMap[p._id.toString()] || 0,
+    }));
+
+    res.json(enriched);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'SERVER_ERROR', message: 'Server error fetching admin products' });
+  }
+};
+
+// @desc    Get all products (paginated, public)
 // @route   GET /api/products
 export const getProducts = async (req, res) => {
   try {
@@ -52,12 +92,7 @@ export const getProducts = async (req, res) => {
 
     const total = await Product.countDocuments({});
 
-    res.json({
-      products,
-      page,
-      pages: Math.ceil(total / limit),
-      total,
-    });
+    res.json({ products, page, pages: Math.ceil(total / limit), total });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'SERVER_ERROR', message: 'Server error fetching products' });
@@ -68,13 +103,18 @@ export const getProducts = async (req, res) => {
 // @route   GET /api/products/search
 export const searchProducts = async (req, res) => {
   try {
-    const { q } = req.query;
+    const { q, categoryId } = req.query;
     if (!q) {
       return res.status(400).json({ error: 'BAD_REQUEST', message: 'Search query parameter "q" is required' });
     }
 
+    const query = { $text: { $search: q } };
+    if (categoryId && categoryId !== 'all') {
+      query.categoryId = categoryId;
+    }
+
     const products = await Product.find(
-      { $text: { $search: q } },
+      query,
       { score: { $meta: 'textScore' } }
     ).sort({ score: { $meta: 'textScore' } }).populate('addons');
 
@@ -85,14 +125,80 @@ export const searchProducts = async (req, res) => {
   }
 };
 
-// @desc    Update product stock
+// @desc    Update a product (admin)
+// @route   PUT /api/products/:id
+export const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description, cost, taxPercentage, imageUrl, stockQuantity, isCombo, addons, categoryId } = req.body;
+
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({ error: 'NOT_FOUND', message: 'Product not found' });
+    }
+
+    // Handle stock change and log ledger
+    if (stockQuantity !== undefined && Number(stockQuantity) !== product.stockQuantity) {
+      const diff = Number(stockQuantity) - product.stockQuantity;
+      await StockLedger.create({
+        productId: id,
+        changeAmount: diff,
+        reason: 'Admin Stock Adjustment',
+        performedBy: req.user._id,
+      });
+    }
+
+    const updated = await Product.findByIdAndUpdate(
+      id,
+      {
+        ...(categoryId !== undefined && { categoryId }),
+        ...(title !== undefined && { title }),
+        ...(description !== undefined && { description }),
+        ...(cost !== undefined && { cost: Number(cost) }),
+        ...(taxPercentage !== undefined && { taxPercentage: Number(taxPercentage) }),
+        ...(imageUrl !== undefined && { imageUrl }),
+        ...(stockQuantity !== undefined && { stockQuantity: Number(stockQuantity) }),
+        ...(isCombo !== undefined && { isCombo }),
+        ...(addons !== undefined && { addons }),
+      },
+      { new: true, runValidators: true }
+    ).populate('categoryId', 'name').populate('addons', 'title cost imageUrl');
+
+    res.json(updated);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'SERVER_ERROR', message: 'Server error updating product' });
+  }
+};
+
+// @desc    Delete a product (admin)
+// @route   DELETE /api/products/:id
+export const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({ error: 'NOT_FOUND', message: 'Product not found' });
+    }
+
+    await Product.findByIdAndDelete(id);
+    await StockLedger.deleteMany({ productId: id });
+
+    res.json({ success: true, message: 'Product deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'SERVER_ERROR', message: 'Server error deleting product' });
+  }
+};
+
+// @desc    Update product stock (admin)
 // @route   PUT /api/products/:id/stock
 export const updateStock = async (req, res) => {
   try {
     const { changeAmount, reason } = req.body;
     const productId = req.params.id;
 
-    if (!changeAmount || !reason) {
+    if (changeAmount === undefined || !reason) {
       return res.status(400).json({ error: 'BAD_REQUEST', message: 'Please provide changeAmount and reason' });
     }
 
@@ -106,14 +212,12 @@ export const updateStock = async (req, res) => {
       return res.status(400).json({ error: 'INSUFFICIENT_STOCK', message: 'Stock cannot be negative' });
     }
 
-    // Atomic update
     const updatedProduct = await Product.findOneAndUpdate(
       { _id: productId },
       { $inc: { stockQuantity: Number(changeAmount) } },
       { new: true, runValidators: true }
     );
 
-    // Create ledger entry
     await StockLedger.create({
       productId,
       changeAmount: Number(changeAmount),

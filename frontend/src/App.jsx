@@ -11,6 +11,14 @@ import SignupPage from './pages/SignupPage';
 import CheckoutPage from './pages/CheckoutPage';
 import OrderHistoryPage from './pages/OrderHistoryPage';
 
+// Admin Pages
+import AdminRoute from './components/AdminRoute';
+import AdminLayout from './components/admin/AdminLayout';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminProductsPage from './pages/admin/AdminProductsPage';
+import AdminCategoriesPage from './pages/admin/AdminCategoriesPage';
+import AdminOrdersPage from './pages/admin/AdminOrdersPage';
+
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
@@ -44,6 +52,21 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+
+            {/* Admin Routes */}
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <AdminLayout />
+                </AdminRoute>
+              }
+            >
+              <Route index element={<AdminDashboardPage />} />
+              <Route path="products" element={<AdminProductsPage />} />
+              <Route path="categories" element={<AdminCategoriesPage />} />
+              <Route path="orders" element={<AdminOrdersPage />} />
+            </Route>
           </Routes>
         </main>
 
