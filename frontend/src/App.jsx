@@ -1,16 +1,56 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import CartSidebar from './components/CartSidebar';
+import ProtectedRoute from './components/ProtectedRoute';
+
+// Pages
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
+import CheckoutPage from './pages/CheckoutPage';
+import OrderHistoryPage from './pages/OrderHistoryPage';
 
 function App() {
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const toggleCart = () => setIsCartOpen(!isCartOpen);
+
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-          <h1>Hackathon Ready MERN Setup</h1>
-          <p>Frontend connected and rendering correctly.</p>
-        </div>} />
-      </Routes>
-    </BrowserRouter>
-  )
+    <Router>
+      <div className="flex flex-col min-h-screen">
+        <Navbar toggleCart={toggleCart} />
+        
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            
+            {/* Protected Routes */}
+            <Route 
+              path="/checkout" 
+              element={
+                <ProtectedRoute>
+                  <CheckoutPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/orders" 
+              element={
+                <ProtectedRoute>
+                  <OrderHistoryPage />
+                </ProtectedRoute>
+              } 
+            />
+          </Routes>
+        </main>
+
+        <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      </div>
+    </Router>
+  );
 }
 
-export default App
+export default App;
