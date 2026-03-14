@@ -5,7 +5,7 @@ import api from '../api/axios';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
+  const [email_id, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -19,7 +19,7 @@ const LoginPage = () => {
     setError('');
 
     try {
-      const { data } = await api.post('/auth/login', { email, password });
+      const { data } = await api.post('/auth/login', { email_id, password });
       login(data, data.token);
       if (data.role === 'Admin') {
         navigate('/admin');
@@ -117,10 +117,10 @@ const LoginPage = () => {
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                 <input
-                  id="login-email"
-                  type="email"
+                  id="login-email_id"
+                  type="email_id"
                   required
-                  value={email}
+                  value={email_id}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@test.com"
                   className="input-field pl-11"
