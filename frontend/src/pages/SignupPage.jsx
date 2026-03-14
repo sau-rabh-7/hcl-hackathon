@@ -6,7 +6,7 @@ import { Mail, Lock, User, Eye, EyeOff, ArrowRight } from 'lucide-react';
 
 const SignupPage = () => {
   const [name, setName] = useState('');
-  const [email_id, setEmail] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isAdminRole, setIsAdminRole] = useState(false);
@@ -21,11 +21,11 @@ const SignupPage = () => {
     setError('');
 
     try {
-      const { data } = await api.post('/auth/signup', { 
-        name, 
-        email_id, 
-        password, 
-        role: isAdminRole ? 'Admin' : 'User' 
+      const { data } = await api.post('/auth/signup', {
+        name,
+        email_id,
+        password,
+        role: isAdminRole ? 'Admin' : 'User'
       });
       login(data, data.token);
       if (data.role === 'Admin') {
@@ -190,11 +190,10 @@ const SignupPage = () => {
                     {[1, 2, 3].map((level) => (
                       <div
                         key={level}
-                        className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
-                          passwordStrength >= level
+                        className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${passwordStrength >= level
                             ? strengthConfig[passwordStrength]?.color
                             : 'bg-gray-200'
-                        }`}
+                          }`}
                       />
                     ))}
                   </div>
@@ -207,9 +206,9 @@ const SignupPage = () => {
 
             {/* Role Toggle */}
             <div className="flex items-center gap-3 bg-white border border-gray-200 p-3 rounded-xl transition-colors hover:border-brand-yellow/50">
-              <input 
-                type="checkbox" 
-                id="role-toggle" 
+              <input
+                type="checkbox"
+                id="role-toggle"
                 checked={isAdminRole}
                 onChange={(e) => setIsAdminRole(e.target.checked)}
                 className="w-5 h-5 rounded border-gray-300 text-brand-yellow focus:ring-brand-yellow/30"
