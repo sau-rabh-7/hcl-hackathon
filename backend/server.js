@@ -23,15 +23,16 @@ app.get('/', (req, res) => {
 
 // Database connection
 const PORT = process.env.PORT || 8080;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/hackathon_db';
+const MONGO_URI = process.env.MONGO_URI;
 
 mongoose.connect(MONGO_URI)
   .then(() => {
     console.log('Connected to MongoDB');
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      console.log(`Server running on port ${PORT}`);
     });
   })
   .catch((error) => {
-    console.error('Error connecting to MongoDB:', error.message);
+    console.error('MongoDB connection failed:', error);
+    process.exit(1);
   });
