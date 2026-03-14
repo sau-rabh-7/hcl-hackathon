@@ -9,6 +9,8 @@ dotenv.config();
 const app = express();
 
 // Middleware
+//hi its gaurav'
+//we are in hcl hackathon
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
